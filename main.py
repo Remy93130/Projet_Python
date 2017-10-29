@@ -15,55 +15,52 @@ def animation_balle(balle):
 	"""
 	Permet de deplacer la balle
 	"""
-	global xBalle, yBalle, deplacementX, deplacementY
+	global positionBalle
 	efface(balle)
-	xBalle += deplacementX
-	yBalle -= deplacementY
-	balle = cercle(xBalle, yBalle, 4, remplissage="black")
+	positionBalle = (positionBalle[0]+ deplacementX, positionBalle[1] - deplacementY)
+	balle = cercle(positionBalle[0], positionBalle[1], 4, remplissage="black")
 	mise_a_jour()
-	sleep(rafraichissement)
 	return(balle)
 
 
-def collision(xBalle, yBalle):
+def collision(positionBalle):
 	"""
-	Permet de vérifier si la balle entre en contact avec un element
+	Permet de verifier si la balle entre en contact avec un element
 	"""
 	global deplacementX, deplacementY
-	global xcote1, xcote2
+	global positionRaquette
 
 	#On verifie si elle touche le haut de la fenetre
-	if (yBalle <= 0):
+	if (positionBalle[1] <= 0):
 		deplacementY *= -1 #On inverse le deplacement verticale de la balle
 
 	#On verifie si elle touche un cote de la fenetre
-	if (xBalle <= 0 or xBalle >= 300):
+	if (positionBalle[0] <= 0 or positionBalle[0] >= 300):
 		deplacementX *= -1 #On inverse le deplacement honrizontale de la balle
 
 	#On verifie si elle touche la raquette:
-	if (xBalle >= xcote1 and xBalle <= xcote2) and (yBalle == 420):
+	if (positionBalle[0] >= positionRaquette[0] and positionBalle[0] <= positionRaquette[2]) and (positionBalle[1] == 420):
 		deplacementY *= -1 #On renvoie la balle vers le haut
+
 		#On choisi l inclinaison de la balle selon ou elle touche la raquette
-		if (xcote1 <= xBalle and xBalle <= xcote1+16):
+		if ((positionRaquette[0] <= positionBalle[0] and positionBalle[0] <= positionRaquette[0]+16) or 
+			(positionRaquette[0]+64 <= positionBalle[0] and positionBalle[0] <= positionRaquette[0]+80)):
+
 			deplacementX = 8
 			deplacementY = 2
-		elif (xcote1+16 <= xBalle and xBalle <= xcote1+32):
+		elif ((positionRaquette[0]+16 <= positionBalle[0] and positionBalle[0] <= positionRaquette[0]+32) or 
+			(positionRaquette[0]+48 <= positionBalle[0] and positionBalle[0] <= positionRaquette[0]+64)):
+
 			deplacementX = 6
 			deplacementY = 4
-		elif (xcote1+32 <= xBalle and xBalle <= xcote1+48):
+		elif (positionRaquette[0]+32 <= positionBalle[0] and positionBalle[0] <= positionRaquette[0]+48):
 			deplacementX = 0
 			deplacementY = 10
-		elif (xcote1+48 <= xBalle and xBalle <= xcote1+64):
-			deplacementX = 6
-			deplacementY = 4
-		else:
-			deplacementX = 8
-			deplacementY = 2
 		#Verifie si la balle doit changer de direction selon le positionnement
 		#De la raquette
-		if (xBalle < ((xcote1+xcote2)/2) and deplacementX > 0):
+		if (positionBalle[0] < ((positionRaquette[0]+positionRaquette[2])/2) and deplacementX > 0):
 			deplacementX *= -1
-		if (xBalle > ((xcote1+xcote2)/2) and deplacementX < 0):
+		if (positionBalle[0] > ((positionRaquette[0]+positionRaquette[2])/2) and deplacementX < 0):
 			deplacementX *= -1
 
 
@@ -72,23 +69,25 @@ def animation_raquette(raquette):
 	"""
 	Permet de deplacer la raquette
 	"""
-	global xcote1, ycote1
-	global xcote2, ycote2
+	global positionRaquette
 	efface(raquette)
 	appuie = donne_evenement()
 	type_appuie = type_evenement(appuie)
 	if type_appuie == "Touche":
 		deplace = touche(appuie)
-		if deplace == 'Right' and xcote2 < 300:
-			xcote1 +=20
-			xcote2 +=20
+		if deplace == 'Right' and positionRaquette[2] < 300:
+
+			positionRaquette = (positionRaquette[0]+20, positionRaquette[1],
+			 positionRaquette[2]+20, positionRaquette[3])
 			
-		if deplace == 'Left' and xcote1 > 0:
-			xcote1 -=20
-			xcote2 -=20
+		if deplace == 'Left' and positionRaquette[0] > 0:
 			
-	raquette = rectangle(xcote1, ycote1, xcote2, ycote2,
-		couleur='black', remplissage='blue', epaisseur=1)
+			positionRaquette = (positionRaquette[0]-20, positionRaquette[1],
+			 positionRaquette[2]-20, positionRaquette[3])
+			
+	raquette = rectangle(positionRaquette[0], positionRaquette[1], 
+		positionRaquette[2], positionRaquette[3],
+		couleur='black', remplissage='blue', epaisseur=1,)
 	mise_a_jour()
 	return raquette 
 
@@ -98,37 +97,80 @@ def fin_jeu(vie):
 	Permet de verifier si la balle n est pas renvoyer
 	fonction incomplete creer pour une update futur
 	"""
-	if yBalle > 450: #Si on a perdu a faire dans une autre fonction
+	if positionBalle[1] > 453:
 		vie -= 1
 	return(vie)
+
+
+def creation_brique():
+	"""
+	creer les briques qui devront etre detruite
+	"""
+	brique = [
+	1,2,2,2,2,2,1,
+	1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1
+	]
+
+
+def afficher_brique(brique):
+	"""
+	Permet d'afficher les briques dans la fenetre
+	"""
+	for element in brique:
+		#On verifie si il y a une brique
+		if element != 0:
+			#On verifie la durabilite de la brique et donc sa couleur
+			if element == 1:
+				couleur = 'green'
+			elif element == 2:
+				couleur = 'yellow'
+			else:
+				couleur = 'red'
+			#On obtient la position des briques
+			
+
 
 
 if __name__ == '__main__':
 	
 
 	creation_fenetre()
+
 	#Vitesse de deplacement de la balle
 	deplacementX = 0
 	deplacementY = 10
 	rafraichissement = 0.035 #(a modifier selon la machine)
+
 	#Position de depart de la raquette
-	xcote1, ycote1 = 110, 420
-	xcote2, ycote2 = 190, 430
-	raquette = rectangle(xcote1, ycote1, xcote2, ycote2,
+	positionRaquette = (110, 420, 190, 430)
+	raquette = rectangle(positionRaquette[0], positionRaquette[1], 
+		positionRaquette[2], positionRaquette[3],
 		couleur='black', remplissage='', epaisseur=1,)
+
 	#Position de depart de la balle
-	xBalle, yBalle = 150, 400
-	balle = cercle(xBalle, yBalle, 4, remplissage="black")
+	positionBalle = (150, 400)
+	balle = cercle(positionBalle[0], positionBalle[1], 4, remplissage="black")
 	vie = 1
-	attente_clic()
+	attente_touche()
 
 	while (vie > 0): #A modifier lorqu il y aura plusieur vie !
+
 		raquette = animation_raquette(raquette)
 		balle = animation_balle(balle)
-		collision(xBalle, yBalle)
+		collision(positionBalle)
 		vie = fin_jeu(vie)
+		sleep(rafraichissement)
 	
+
 	texte(30, 225, 'Vous avez perdu', couleur='red',
 		ancrage='nw', police="Purisa", taille=24)
-	attente_clic()
+	attente_touche()
 	ferme_fenetre()
