@@ -10,7 +10,7 @@ from math import *
 
 # Variables globales ---------------------------------------------------------------------------------------------
 deplacementBalle = [0,0]
-deplacementBalle[0] = 1#randint(0,8)
+deplacementBalle[0] = randint(0,8)
 if deplacementBalle[0] != 0:
 	deplacementBalle[0] = deplacementBalle[0] / 10
 deplacementBalle[1] = 1-deplacementBalle[0]
@@ -222,6 +222,7 @@ def collision_brique(brique,positionBalle, score):
 						score += 10
 					efface('t')
 					afficher_brique(brique)
+					creation_interface(score, vie)
 					mise_a_jour()
 					
 					
@@ -232,6 +233,7 @@ def collision_brique(brique,positionBalle, score):
 						score += 10
 					efface('t')
 					afficher_brique(brique)
+					creation_interface(score, vie)
 					mise_a_jour()
 					
 				if (positionBalle[0] > j and positionBalle[0] < j+40) and (positionBalle[1] > i+12 and positionBalle[1] < i+15): # bas
@@ -242,6 +244,7 @@ def collision_brique(brique,positionBalle, score):
 							score += 10
 						efface('t')
 						afficher_brique(brique)
+						creation_interface(score, vie)
 						mise_a_jour()
 					else: # autrement c'est qu'elle descend, donc elle ne doit pas inverser son Y mais son X
 						deplacementBalle[0] *= -1
@@ -250,6 +253,7 @@ def collision_brique(brique,positionBalle, score):
 							score += 10
 						efface('t')
 						afficher_brique(brique)
+						creation_interface(score, vie)
 						mise_a_jour()
 				
 				if (positionBalle[0] > j and positionBalle[0] < j+40) and (positionBalle[1] < i+3 and positionBalle[1] > i): # haut 
@@ -260,6 +264,7 @@ def collision_brique(brique,positionBalle, score):
 							score += 10
 						efface('t')
 						afficher_brique(brique)
+						creation_interface(score, vie)
 						mise_a_jour()
 					else: #autrement c'est qu'elle monte, donc elle ne doit pas inverser son Y mais son X
 						deplacementBalle[0] *= -1
@@ -268,6 +273,7 @@ def collision_brique(brique,positionBalle, score):
 							score += 10
 						efface('t')
 						afficher_brique(brique)
+						creation_interface(score, vie)
 						mise_a_jour()															
 			briqueTester += 1
 	return score
@@ -291,6 +297,7 @@ if __name__ == '__main__':
 	hauteur = 450
 	largeur = 450
 	fin = False
+	a = 0
 
 	#Definition de variable pour l interface
 	score = 0
@@ -305,9 +312,9 @@ if __name__ == '__main__':
 		
 	#Vitesse de deplacement de la balle a modifier selon la machine
 	if "auto" in argv: #On augmente la vitesse du jeu si on est en mode auto (debogage)
-		rafraichissement = 1/(10**10)#0.0025
+		rafraichissement = 0.00005
 	else:
-		rafraichissement = 1/(10**10)#0.0000001#0.0025
+		rafraichissement = 0.00005
 
 	raquette = rectangle(positionRaquette[0], positionRaquette[1], 
 		positionRaquette[2], positionRaquette[3],
@@ -335,7 +342,7 @@ if __name__ == '__main__':
 		
 		
 		score = collision_brique(brique,positionBalle, score)
-		creation_interface(score, vie)
+		#creation_interface(score, vie)
 		reset = fin_jeu(vie, positionBalle)
 		if reset: #Si le joueur a perdu une vie
 			vie = reset[0]
@@ -347,11 +354,13 @@ if __name__ == '__main__':
 				ancrage='nw', police="Purisa", taille=20, tag='texteC')
 			attente_touche()
 			efface('texteC')
-			
-		fin = verification_brique(brique)
-		temps = timer(temps[0], temps[1])
 		sleep(rafraichissement)
-		tempsATM = int(time()-temps[1])
+		fin = verification_brique(brique)
+		#temps = timer(temps[0], temps[1])
+		if a%100 == 0:
+			temps = timer(temps[0], temps[1])
+			a = 0
+		a += 1
 
 	efface(balle)
 	efface(raquette)
@@ -369,6 +378,6 @@ if __name__ == '__main__':
 		creation_interface(score, vie)
 		print(score)
 
-	sleep(1)
+	sleep(rafraichissement)
 	attente_touche()
 	ferme_fenetre()
