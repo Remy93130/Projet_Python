@@ -3,10 +3,9 @@
 """Fonctions d'un jeu de Casse brique."""
 # Imports --------------------------------------------------------------------------------------------------------
 from upemtk import *
-from time import *
+from time import time
 from random import randint
 from sys import argv
-from math import *
 
 # Variables globales ---------------------------------------------------------------------------------------------
 deplacementBalle = [0,0]
@@ -15,8 +14,11 @@ if deplacementBalle[0] != 0:
 	deplacementBalle[0] = deplacementBalle[0] / 10
 deplacementBalle[1] = 1-deplacementBalle[0]
 positionRaquette = [110, 420, 190, 430]
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------Fonctions d'interface-----------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
-# Fonctions ------------------------------------------------------------------------------------------------------
+
 def creation_interface(score, vie):
 	"""Cree l interface du jeu."""
 	efface('score')
@@ -26,7 +28,8 @@ def creation_interface(score, vie):
 
 
 def timer(minute, tempsDebut):
-	"""Permet de faire un chronometre"""
+	"""Permet de faire le chronometre du jeu renvoie le tuple
+	avec les minutes et le temps du debut"""
 	efface('timer')
 	tempsATM = int(time()-tempsDebut)
 	#Si une minute est passe
@@ -38,15 +41,25 @@ def timer(minute, tempsDebut):
 	texte(320,120, "Temps : " + str(minute) + ':' + str(tempsATM),
 		taille=14, tag='timer')
 	return (minute, tempsDebut)
-
-
-def animation_balle(balle):
-	"""Permet de deplacer la balle."""
-	global positionBalle
-	positionBalle = (positionBalle[0] + deplacementBalle[0], positionBalle[1] - deplacementBalle[1])
-	balle = cercle(positionBalle[0], positionBalle[1], 4, remplissage="black")
-	mise_a_jour()
-	return(balle)
+	
+	
+def fin_jeu(vie, positionBalle):
+	"""Permet de verifier si la balle n est pas renvoyer
+	Sinon la balle est repositionner renvoie le vie et la 
+	position de la balle si la balle est perdue sinon rien
+	>>> fin_jeu(3, [150, 455])
+	(2, [150, 400])
+	>>> fin_jeu(3, [150, 150])
+	"""
+	if positionBalle[1] > 453:
+		vie -= 1
+		positionBalle = [150, 400]
+		return (vie, positionBalle)
+	return None
+	
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------Fonctions de collision----------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 
 def collision(positionBalle):
@@ -100,6 +113,22 @@ def collision_raquette(positionBalle):
 			deplacementBalle[0] *= -1
 		if (positionBalle[0] > ((positionRaquette[0]+positionRaquette[2])/2) and deplacementBalle[0] < 0):
 			deplacementBalle[0] *= -1
+			
+			
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------Fonctions d'animation-----------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+
+def animation_balle(balle):
+	"""Permet de deplacer la balle."""
+	global positionBalle
+	positionBalle = (positionBalle[0] + deplacementBalle[0], positionBalle[1] - deplacementBalle[1])
+	balle = cercle(positionBalle[0], positionBalle[1], 4, remplissage="black")
+	mise_a_jour()
+	return(balle)
+
+
+
 
 
 def animation_raquette(raquette):
@@ -149,30 +178,16 @@ def mode_auto(raquette):
 	mise_a_jour()
 	return raquette 
 
-def fin_jeu(vie, positionBalle):
-	"""Permet de verifier si la balle n est pas renvoyer
-	Sinon la balle est repositionner"""
-	if positionBalle[1] > 453:
-		vie -= 1
-		positionBalle = [150, 400]
-		return (vie, positionBalle)
-	return None
 
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------Fonctions des briques-----------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 def creation_brique():
-	"""Creer les briques qui devront etre detruitees"""
-	brique = [
-	3,2,2,2,2,2,3,
-	3,1,1,1,1,1,3,
-	3,2,2,2,2,2,3,
-	0,3,1,1,1,3,0,
-	0,3,0,0,0,3,0,
-	0,3,0,0,0,3,0,
-	1,1,1,1,1,1,1,
-	1,1,1,1,1,1,1,
-	1,1,1,1,1,1,1,
-	1,3,3,3,2,2,1
-	]
+	"""Creer les briques qui devront etre detruites"""
+	brique = []
+	for i in range(70):
+		brique.append(randint(1,3))
 	return(brique)
 
 
@@ -203,11 +218,11 @@ def afficher_brique(brique):
 							#tag= 't')
 					rectangle(j, i, j+40, i+15,
 						couleur='black', remplissage='red', epaisseur=1, tag='t')
-
 			briqueTester += 1
 
 def collision_brique(brique,positionBalle, score):
-	"""Permet de gérer la collision entre la balle et les briques"""
+	"""Permet de gérer la collision entre la balle et les briques et calcule le score
+	si une brique a ete detruite, renvoie le score"""
 	briqueTester = 0 #Parametre de la premiere brique
 	for i in range(10,150,15):
 		for j in range(10,280,40):
@@ -282,88 +297,119 @@ def collision_brique(brique,positionBalle, score):
 	
 def verification_brique(brique):
 	"""Verifie si toutes les briques ont ete detruite
-	renvoie True si oui sinon False"""
+	renvoie True si oui sinon False
+	>>> verification_brique([0,0,0,0])
+	True
+	>>> verification_brique([0,1,0,0])
+	False
+	"""
 	for element in brique:
-		if element >0:
+		if element > 0:
 			return False
 	return True
 	
 	
 	
 if __name__ == '__main__':
-	#import.doctest
-	#doctest.testmod()	
 
 	hauteur = 450
 	largeur = 450
 	fin = False
-	a = 0
+	a = 0 #Rafraichissement du jeu
+	b = 0 #Rafraichissement du timer
 
 	#Definition de variable pour l interface
 	score = 0
 	vie = 3
-	minute = 0
-	
+
+	if "jeveuxdesvies" in argv: #Petit easter egg
+		vie = 99
+	if 'aezakmi' in argv:
+			fin = True
+
+	#Vitesse de deplacement de la balle a modifier selon la machine
+	if "auto" in argv: #On augmente la vitesse du jeu si on est en mode auto (debogage)
+		rafraichissement = 100
+	else:	
+		rafraichissement = 5000
+		
 	cree_fenetre(largeur, hauteur)
 	ligne(300,0,300,450, epaisseur="2", tag='ligne')
 	texte(320,15, "Relobrik", taille=14, tag='nom')
 	creation_interface(score, vie)
 	
 		
-	#Vitesse de deplacement de la balle a modifier selon la machine
-	if "auto" in argv: #On augmente la vitesse du jeu si on est en mode auto (debogage)
-		rafraichissement = 0.00005
-	else:
-		rafraichissement = 0.00005
 
+	
+	#----------Position initiale de la raquette----------#
 	raquette = rectangle(positionRaquette[0], positionRaquette[1], 
 		positionRaquette[2], positionRaquette[3],
 		couleur='black', remplissage='', epaisseur=1,)
 
-	#Position de depart de la balle
+	
+	#----------Position de départ de la balle-------------#
 	positionBalle = [150, 400]
 	balle = cercle(positionBalle[0], positionBalle[1], 4, remplissage="black")
+	
+	#----------Affichage initiale des briques-------------#
 	brique = creation_brique()
 	afficher_brique(brique)
+	
+	#-----------Jeu en attente du joueur------------------#
+	texte(30, 225, '   Appuyez sur une \ntouche pour commencer', couleur='red',
+				ancrage='nw', police="Purisa", taille=10, tag='commence')
 	attente_touche()
-	temps = (minute, time())
-	temps = timer(temps[0], temps[1])
+	efface('commence')
+	
+	#----------affichage initiale du chronometre----------#
+	temps = timer(0, time())
 
 
-	while (vie > 0 and fin == False): #A modifier lorqu il y aura plusieur vie et casser toute les briques!
+	while (vie > 0 and fin == False): #Corps du programmes
 
-		if "auto" in argv: #Si on a choisi le mode auto
-			raquette = mode_auto(raquette)
-		else:
-			raquette = animation_raquette(raquette)
-		efface(balle)
-		balle = animation_balle(balle)
-		collision(positionBalle)
 		
-		
-		score = collision_brique(brique,positionBalle, score)
-		#creation_interface(score, vie)
-		reset = fin_jeu(vie, positionBalle)
-		if reset: #Si le joueur a perdu une vie
-			vie = reset[0]
-			if vie == 0:
-				break
-			positionBalle = reset[1]
-			positionRaquette = [110, 420, 190, 430]
-			texte(30, 225, '   Appuyez sur une \ntouche pour continuer', couleur='red',
-				ancrage='nw', police="Purisa", taille=20, tag='texteC')
-			attente_touche()
-			efface('texteC')
-		sleep(rafraichissement)
-		fin = verification_brique(brique)
-		#temps = timer(temps[0], temps[1])
-		if a%100 == 0:
+
+		if a%rafraichissement == 0:
+
+			if "auto" in argv: #Si on a choisi le mode auto en parametre
+				raquette = mode_auto(raquette)
+			else:
+				raquette = animation_raquette(raquette)
+			efface(balle)
+			balle = animation_balle(balle)
+			collision(positionBalle)
+					
+			score = collision_brique(brique,positionBalle, score)
+			reset = fin_jeu(vie, positionBalle)
+
+			#On verifie si le joueur perd une vie et on remet la balle en place si c est le cas
+			if reset:
+				vie = reset[0]
+				if vie == 0:
+					break
+				positionBalle = reset[1]
+				positionRaquette = [110, 420, 190, 430]
+				creation_interface(score, vie)
+				deplacementBalle[1] *= -1
+				texte(30, 225, '   Appuyez sur une \ntouche pour continuer', couleur='red',
+					ancrage='nw', police="Purisa", taille=20, tag='texteC')
+				attente_touche()
+				efface('texteC')
+
+
+			fin = verification_brique(brique)
 			temps = timer(temps[0], temps[1])
+			if b%100== 0:
+				temps = timer(temps[0], temps[1])
+				b = 0
+			b += 1
 			a = 0
 		a += 1
+		
 
 	efface(balle)
 	efface(raquette)
+
 	if vie == 0:
 		texte(30, 225, 'Vous avez perdu', couleur='red',
 			ancrage='nw', police="Purisa", taille=24)
@@ -374,10 +420,9 @@ if __name__ == '__main__':
 		#On calcule son score final
 		tempsATM = int(time()-temps[1])
 		tempsSeconde = temps[0]*60 + tempsATM
-		score += int((1500/(0.25*tempsSeconde)) + 100*vie)
+		score += int((1500/(0.25*tempsSeconde+1)) + 100*vie)
 		creation_interface(score, vie)
-		print(score)
+		
 
-	sleep(rafraichissement)
 	attente_touche()
 	ferme_fenetre()
