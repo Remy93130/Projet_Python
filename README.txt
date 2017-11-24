@@ -62,7 +62,7 @@ dans le cadre du projet casse brique du DUT informatique 1 de Champs sur Marne.
 
 
                  ╔════════════════════════════╗                
-╔════════════════╣ 	   CHOIX TECHNIQUES       ╠═══════════════╗
+╔════════════════╣     CHOIX TECHNIQUES       ╠═══════════════╗
 ║                ╚════════════════════════════╝               ║
 ║                                                             ║
 ║  Pour tout ce qui est stockage de variable souvent modifier ║
@@ -82,26 +82,26 @@ dans le cadre du projet casse brique du DUT informatique 1 de Champs sur Marne.
 ╚═════════════════════════════════════════════════════════════╝
 
                  ╔════════════════════════════╗                
-╔════════════════╣   PROBLEMES RENCONTRES 	  ╠═══════════════╗
+╔════════════════╣   PROBLEMES RENCONTRES     ╠═══════════════╗
 ║                ╚════════════════════════════╝               ║
 ║                                                             ║
-║	 A travers le développement du casse brique, il y a eu une║
-║	 multitude de problèmes comme la collision des briques,   ║
-║	 leurs affichage ou la fluidité du jeu. La fluidité et    ║
-║	 l'affichage ont été expliqués dans l'optimisation du     ║
-║	 programme quant aux collisions des briques, le plus gros ║
-║	 problèmes était de régler les coordonnées de collisions  ║
-║	 pour la gauche et la droite car le haut et le bas des    ║
-║	 briques étaient prioritaires. Les briques sont donc      ║
-║	 découpées en quatres parties pour la collision, haut,    ║
-║	 bas, droite et gauche. Mais le haut et le bas recouvrent ║
-║	 toute la partie superieur et inferieur de l'écran ainsi  ║
-║	 si la balle tapait dans les coins haut et bas il pouvait ║
-║	 y avoir des bugs car on inverse son axe des ordonnées,   ║
-║	 ainsi nous avons donc rajoutés des conditions, si la     ║
-║	 balle monte et qu'elle touche le haut c'est son axe des  ║
-║	 abcisses qui doit etre inversé  et c'est pareil pour le  ║
-║	 bas de la brique. Voilà comment les collisions des       ║
-║    briques ont été corrigées.                               ║
+║  A travers le développement du casse brique, il y a eu une  ║
+║ multitude de problèmes comme la collision des briques,      ║
+║ leurs affichage ou la fluidité du jeu. La fluidité et       ║
+║ l'affichage ont été expliqués dans l'optimisation du        ║
+║ programme quant aux collisions des briques, le plus gros    ║
+║ problèmes était de régler les coordonnées de collisions     ║
+║ pour la gauche et la droite car le haut et le bas des       ║
+║ briques étaient prioritaires. Les briques sont donc         ║
+║ découpées en quatres parties pour la collision, haut,       ║
+║ bas, droite et gauche. Mais le haut et le bas recouvrent    ║
+║ toute la partie superieur et inferieur de l'écran ainsi     ║
+║ si la balle tapait dans les coins haut et bas il pouvait    ║
+║ y avoir des bugs car on inverse son axe des ordonnées,      ║
+║ ainsi nous avons donc rajoutés des conditions, si la        ║
+║ balle monte et qu'elle touche le haut c'est son axe des     ║
+║ abcisses qui doit etre inversé  et c'est pareil pour le     ║
+║ bas de la brique. Voilà comment les collisions des          ║
+║ briques ont été corrigées.                                  ║
 ║                                                             ║
 ╚═════════════════════════════════════════════════════════════╝
