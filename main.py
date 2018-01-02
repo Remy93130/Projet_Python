@@ -1,6 +1,7 @@
-import jeu
 from upemtk import *
 import sys
+import jeu
+import score
 
 def interface_start():
 	"""Creation de l interface de depart"""
@@ -14,24 +15,20 @@ def interface_start():
 def lecture():
 	brique = list()
 	fichier = open("brique_perso.txt", 'r')
-	briqueParCol, briqueParLign = None, None
 	for ligne in fichier.readlines():
 		if ligne[0] == '#':
 			continue
-		elif not briqueParCol:
-			briqueParCol = int(ligne.strip())
 		else:
-			briqueL = ligne.strip()[0:briqueParLign]
+			briqueL = ligne.strip()[0:7]
 			for element in ligne.strip():
 				brique.append(int(element))
-	if len(brique) != 7*briqueParCol:
+	fichier.close()
+
+	if len(brique) != 7*10:
 		print("Il y a un probleme avec le niveau personnalisé")
 		sys.exit(0)
 	return brique
-
-
-	fichier.close()
-	pass
+	
 
 if __name__ == '__main__':
 	

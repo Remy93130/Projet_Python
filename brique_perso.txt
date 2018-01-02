@@ -1,12 +1,10 @@
 #Bienvenue dans le createur de brique personalise
 #Ici vous pourrez creer vos modele de brique comme bon vous semble
 #Voici les regles a respecter :
-#Tout d abord mettre le nombre de ligne (10 conseiller)
-#Puis pour chaque ligne mettre la brique que vous souhaiter
+#Il y a un total de 10 brique par colonne et 7 brique par ligne
+#Chaque numero correspond a une brique
 #0 = pas de brique 1 = petite brique 2 = moyenne brique 3 = grosse brique
-#Il y a 7 brique par ligne au total
 #A vous de jouer
-10
 1111111
 0111110
 2233322

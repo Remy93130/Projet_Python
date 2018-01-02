@@ -3,9 +3,11 @@
 """Fonctions d'un jeu de Casse brique."""
 # Imports --------------------------------------------------------------------------------------------------------
 from upemtk import *
-from time import time
+from time import time, sleep
 from random import randint
 from sys import argv
+from score import *
+
 
 # Variables globales ---------------------------------------------------------------------------------------------
 deplacementBalle = [0,0]
@@ -70,9 +72,6 @@ def pause():
 				break
 		mise_a_jour()
 				
-	
-
-	
 	
 	
 	
@@ -205,9 +204,18 @@ def mode_auto(raquette):
 
 def creation_brique():
 	"""Creer les briques qui devront etre detruites"""
-	brique = []
-	for i in range(70):
-		brique.append(randint(1,3))
+	brique = [
+	1, 1, 1, 1, 1, 1, 1,
+	2, 2, 0, 0, 0, 2, 2,
+	1, 1, 3, 3, 3, 1, 1,
+	0, 2, 1, 1, 1, 2, 0,
+	3, 0, 0, 2, 0, 0, 3,
+	3, 3, 0, 2, 0, 3, 3,
+	2, 2, 2, 2, 2, 2, 2,
+	0, 0, 2, 2, 2, 0, 0,
+	1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1,
+	]
 	return(brique)
 
 
@@ -325,7 +333,10 @@ def lancement(modePerso):
 	ligne(300,0,300,450, epaisseur="2", tag='ligne')
 	texte(320,15, "Relobrik", taille=14, tag='nom')
 	creation_interface(score, vie)
-	
+
+	if not modePerso[0]:
+		highscore = lecture_score()
+		affichage_score(highscore)
 		
 
 	
@@ -359,7 +370,6 @@ def lancement(modePerso):
 	while (vie > 0 and fin == False): #Corps du programmes
 
 		
-
 		if a%rafraichissement == 0:
 			if "auto" in argv: #Si on a choisi le mode auto en parametre
 				raquette = mode_auto(raquette)
@@ -413,7 +423,9 @@ def lancement(modePerso):
 		tempsSeconde = temps[0]*60 + tempsATM
 		score += int((1500/(0.25*tempsSeconde+1)) + 100*vie)
 		creation_interface(score, vie)
-		
+		sleep(1)
+		if not modePerso[0] and score > highscore[-1][0]: #Verification meilleur score
+			meilleur_score(score, highscore)
 
 	attente_touche()
 	ferme_fenetre()
