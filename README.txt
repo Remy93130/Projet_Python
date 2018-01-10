@@ -37,7 +37,15 @@ dans le cadre du projet casse brique du DUT informatique 1 de Champs sur Marne.
 ║  Pour augmenter la fluidité possible, nous avons retirés    ║
 ║  la fonction sleep du module time et fait avec un systeme   ║
 ║  de module (cf tp snake) afin de mieux pouvoir gerer le     ║
-║  rafraichissement du programme                              ║
+║  rafraichissement du programme.                             ║
+║                                                             ║
+║  Lors du Premier rendus, notre casse brique ne possedait pas║
+║  de vecteur vitesse, la balle ne faisait que s'incrementer  ║
+║  de 1 par rafraichissement, désormais il y a la possibilité ║
+║  de modifier ce vecteur vitesse, ainsi la balle peut        ║
+║  s'incrementer de 1 comme de 3 sans pour autant avoir des   ║
+║  problèmes avec la collision. Cette optimisation permet aux ║
+║  machines lentes de pouvoir jouer sans problèmes.           ║
 ║                                                             ║
 ╚═════════════════════════════════════════════════════════════╝
 
@@ -46,7 +54,7 @@ dans le cadre du projet casse brique du DUT informatique 1 de Champs sur Marne.
 ╔════════════════╣ ORGANISATION DU PROGRAMME  ╠═══════════════╗
 ║                ╚════════════════════════════╝               ║
 ║                                                             ║
-║  Le programme est organisé en fonction qui sont regrouper   ║
+║  Le programme est organisé en fonctions qui sont regrouper  ║
 ║  par thèmes (collision, animation, etc..) pour le futur, ces║
 ║  thèmes seront ranger dans des modules.                     ║
 ║                                                             ║
@@ -55,7 +63,13 @@ dans le cadre du projet casse brique du DUT informatique 1 de Champs sur Marne.
 ║  ainsi que la boucle while qui fait tourner le programme,   ║
 ║  on sort de cette boucle si l'on gagne ou si l'on n'a plus  ║
 ║  aucune vie, cela va ramener aux lignes de fin du programme ║
-║  qui agit en fonction de la victoire ou de la défaite       ║
+║  qui agit en fonction de la victoire ou de la défaite.      ║
+║                                                             ║
+║  Lorsque le joueur perd ou gagne, il a la possibilité de    ║
+║  directement relancer une partie dans une nouvelle fenêtre  ║
+║  en appuyant sur R, d'où l'interêt de couper le code en     ║
+║  différents fichiers qui peuvent s'appeler les uns et       ║
+║  les autres.                                                ║
 ║                                                             ║
 ║                                                             ║
 ╚═════════════════════════════════════════════════════════════╝
@@ -79,6 +93,10 @@ dans le cadre du projet casse brique du DUT informatique 1 de Champs sur Marne.
 ║  soient globale car elles sont tres souvent utiliser dans   ║
 ║  les fonctions que l'ont utilise                            ║
 ║                                                             ║
+║  Désormais, seul le main.py possède un corps, tout nos      ║
+║  autres fichier possède des fonctions qui contribue aux jeu ║
+║  même les variables sont maintenant dans des fonctions      ║
+║                                                             ║
 ╚═════════════════════════════════════════════════════════════╝
 
                  ╔════════════════════════════╗                
@@ -93,15 +111,31 @@ dans le cadre du projet casse brique du DUT informatique 1 de Champs sur Marne.
 ║ problèmes était de régler les coordonnées de collisions     ║
 ║ pour la gauche et la droite car le haut et le bas des       ║
 ║ briques étaient prioritaires. Les briques sont donc         ║
-║ découpées en quatres parties pour la collision, haut,       ║
+║ découpées en quatre parties pour la collision, haut,        ║
 ║ bas, droite et gauche. Mais le haut et le bas recouvrent    ║
 ║ toute la partie superieur et inferieur de l'écran ainsi     ║
 ║ si la balle tapait dans les coins haut et bas il pouvait    ║
 ║ y avoir des bugs car on inverse son axe des ordonnées,      ║
 ║ ainsi nous avons donc rajoutés des conditions, si la        ║
 ║ balle monte et qu'elle touche le haut c'est son axe des     ║
-║ abcisses qui doit etre inversé  et c'est pareil pour le     ║
+║ abscisses qui doit etre inversé  et c'est pareil pour le    ║
 ║ bas de la brique. Voilà comment les collisions des          ║
 ║ briques ont été corrigées.                                  ║
+║                                                             ║
+║ Après avoir insérer un vecteur vitesse, il y a eu d'autres  ║
+║ problèmes avec la collision, notamment lorsque la balle     ║
+║ possedait un vecteur vitesse trop important, mais nous avons║
+║ su corriger ce problème en utilisant plus de précisions     ║
+║ sur les coordonnées de la balle et des briques dans notre   ║
+║ programme.                                                  ║
+║                                                             ║
+║ La gestion du menu pause était aussi assez compliquée.      ║
+║ En effet, il fallait utiliser les fonctions événements de   ║
+║ la bibliothèque upemtk en même temps que les déplacements   ║
+║ de la raquette car un seul événement peut donner plusieurs  ║
+║ possibilité ( position de la souris, clic ou touche)        ║
+║ c'est pour cette raison que la fonction pause a uniquement  ║
+║ la possibilité d'être appelée dans la fonction qui          ║
+║ contrôle la raquette.                                       ║
 ║                                                             ║
 ╚═════════════════════════════════════════════════════════════╝

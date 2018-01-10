@@ -1,7 +1,12 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Fonctions pour gerer les scores."""
+# Imports --------------------------------------------------------------------------------------------------------
 from upemtk import *
 
 ENTREE = "meilleur_score"
 
+# Fonctions ------------------------------------------------------------------------------------------------------
 def lecture_score():
 	"""Récupere les score dans le fichier score, les trie et les renvoie"""
 	fichier = open(ENTREE, 'r')

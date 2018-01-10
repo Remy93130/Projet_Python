@@ -7,16 +7,19 @@ from time import time, sleep
 from random import randint
 from sys import argv
 from score import *
-
+import main 
 
 # Variables globales ---------------------------------------------------------------------------------------------
-deplacementBalle = [0,0]
-deplacementBalle[0] = randint(0,8)
-if deplacementBalle[0] != 0:
-	deplacementBalle[0] = deplacementBalle[0] / 10
-deplacementBalle[1] = 1-deplacementBalle[0]
-positionRaquette = [110, 420, 190, 430]
-v_vitesse = 1
+def variables_globales():
+	"""Permet d'initialiser la position de la raquette et les deplacements de la balle."""
+	global deplacementBalle, v_vitesse, positionRaquette
+	deplacementBalle = [0,0]
+	deplacementBalle[0] = randint(0,8)
+	if deplacementBalle[0] != 0:
+		deplacementBalle[0] = deplacementBalle[0] / 10
+	deplacementBalle[1] = 1-deplacementBalle[0]
+	positionRaquette = [110, 420, 190, 430]
+	v_vitesse = 1
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 #---------------------------------------------------------------Fonctions d'interface-----------------------------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
@@ -32,7 +35,7 @@ def creation_interface(score, vie):
 
 def timer(minute, tempsDebut):
 	"""Permet de faire le chronometre du jeu renvoie le tuple
-	avec les minutes et le temps du debut"""
+	avec les minutes et le temps du debut."""
 	efface('timer')
 	tempsATM = int(time()-tempsDebut)
 	#Si une minute est passe
@@ -60,20 +63,46 @@ def fin_jeu(vie, positionBalle):
 		return (vie, positionBalle)
 	return None
 	
+
 def pause():
-	global temps
+	"""Permet de marquer une pause, appelée si l'utilisateur a appuyer sur P
+	, permet aussi de redefinir le type de contrôle de la raquette"""
+	global contrôle 
+	efface('balle')
+	rectangle(10, 200, 280, 350,couleur='black', epaisseur=1, tag='menu_pause')
+	texte(130,210, "Pause",
+		taille=12, tag='menu_pause')
+	texte(130,260, "contrôle clavier",
+		taille=9, tag='menu_pause')
+	rectangle(130, 260, 220, 280 ,couleur='black', epaisseur=1, tag='menu_pause')
+	texte(130,310, "contrôle souris",
+		taille=9, tag='menu_pause')
+	rectangle(130, 310, 220, 330,couleur='black', epaisseur=1, tag='menu_pause')
 	while True:
-		temps = timer(temps[0], temps[1])
-		retour = donne_evenement()
-		type_retour = type_evenement(retour)
-		if type_retour == "Touche":
-			go = touche(retour)
+		ev = donne_evenement()
+		type_ev = type_evenement(ev)
+		if type_ev == "Touche":
+			go = touche(ev)
 			if go == 'p':
+				efface('menu_pause')
 				break
+		if type_ev == "ClicDroit" or type_ev == "ClicGauche":
+			coord = (clic_x(ev), clic_y(ev))
+			if coord[0] > 130 and coord[0] < 220 and coord[1] > 260 and coord[1] < 280:
+				rectangle(130, 260, 220, 280 ,couleur='black',remplissage = 'red', epaisseur=1, tag='effect')
+				mise_a_jour()
+				contrôle = 'clavier'
+				sleep(0.2)
+				efface('effect')
+			if coord[0] > 130 and coord[0] < 220 and coord[1] > 310 and coord[1] < 330:
+				rectangle(130, 310, 220, 330 ,couleur='black',remplissage = 'red', epaisseur=1, tag='effect')
+				mise_a_jour()
+				contrôle = 'souris'
+				sleep(0.2)
+				efface('effect')
+		
 		mise_a_jour()
 				
-	
-	
 	
 	
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
@@ -97,7 +126,6 @@ def collision(positionBalle):
 	#On verifie si elle touche la raquette:
 	collision_raquette(positionBalle)
 	
-
 
 def collision_raquette(positionBalle):
 	"""Complement de la fonction collision, permet de vérifier 
@@ -142,19 +170,19 @@ def animation_balle(balle):
 	"""Permet de deplacer la balle."""
 	global positionBalle
 	positionBalle = (positionBalle[0] + v_vitesse*deplacementBalle[0], positionBalle[1] - v_vitesse*deplacementBalle[1])
-	balle = cercle(positionBalle[0], positionBalle[1], 4, remplissage="black")
+	balle = cercle(positionBalle[0], positionBalle[1], 4, remplissage="black" ,tag='balle')
 	mise_a_jour()
 	return(balle)
 
 
-
-def animation_raquette(raquette):
+def animation_raquette_clavier(raquette):
 	"""Permet de deplacer la raquette"""
 	global positionRaquette
-	appuie = donne_evenement()
-	type_appuie = type_evenement(appuie)
-	if type_appuie == "Touche":
-		deplace = touche(appuie)
+	positionRaquette = list(positionRaquette)
+	ev = donne_evenement()
+	type_ev = type_evenement(ev)
+	if type_ev == "Touche":
+		deplace = touche(ev)
 		if deplace == 'Right' and positionRaquette[2] < 300:
 
 			positionRaquette[0] += 10
@@ -166,6 +194,35 @@ def animation_raquette(raquette):
 			positionRaquette[2] -= 10
 			
 		if deplace =='p':
+			pause()
+	efface(raquette)
+	raquette = rectangle(positionRaquette[0], positionRaquette[1], 
+		positionRaquette[2], positionRaquette[3],
+		couleur='black', remplissage='blue', epaisseur=1,)
+	mise_a_jour()
+	return raquette 
+	
+	
+def animation_raquette_souris(raquette):
+	"""Permet de deplacer la raquette"""
+	global positionRaquette
+	ev = donne_evenement()
+	type_ev = type_evenement(ev)
+	if type_ev == "Deplacement":
+		souris = clic_x(ev)
+		positionRaquette = (souris-40, positionRaquette[1],
+			 souris+40, positionRaquette[3])
+	
+	if positionRaquette[0] < -3:
+		positionRaquette = (-3, positionRaquette[1],
+			 77, positionRaquette[3])
+	
+	if positionRaquette[2] > 300:
+		positionRaquette = (220, positionRaquette[1],
+			 300, positionRaquette[3])
+	if type_ev == "Touche":
+		tentative = touche(ev)
+		if tentative =='p':
 			pause()
 	efface(raquette)
 	raquette = rectangle(positionRaquette[0], positionRaquette[1], 
@@ -248,6 +305,7 @@ def afficher_brique(brique):
 						couleur='black', remplissage='red', epaisseur=1, tag='tbrique')
 			briqueTester += 1
 
+
 def collision_brique(brique, positionBalle, score, vie):
 	"""Permet de gérer la collision entre la balle et les briques et calcule le score
 	si une brique a ete detruite."""
@@ -274,6 +332,7 @@ def collision_brique(brique, positionBalle, score, vie):
 			briqueTester += 1
 	return score
 
+
 def effet_de_collision(numbrique, axe, brique, score, vie):
 	"""Fonction complémentaire de collision_brique,permet l'actualisation d'une brique touchée
 	ainsi que l'inversement du deplacement de la balle."""
@@ -287,6 +346,7 @@ def effet_de_collision(numbrique, axe, brique, score, vie):
 	mise_a_jour()
 	return score
 	
+
 def verification_brique(brique):
 	"""Verifie si toutes les briques ont ete detruite
 	renvoie True si oui sinon False
@@ -301,18 +361,17 @@ def verification_brique(brique):
 	return True
 	
 	
-	
 def lancement(modePerso):
 	"""Fonction principale pour lancer le jeu
 	"""
-	global positionRaquette, positionBalle
-
+	global positionRaquette, positionBalle, contrôle, deplacementBalle, v_vitesse
+	variables_globales()
 	hauteur = 450
 	largeur = 450
 	fin = False
 	a = 0 #Rafraichissement du jeu
 	b = 0 #Rafraichissement du timer
-
+	contrôle = 'clavier' # contrôle de la raquette
 	#Definition de variable pour l interface
 	score = 0
 	vie = 3
@@ -339,16 +398,16 @@ def lancement(modePerso):
 		affichage_score(highscore)
 		
 
-	
 	#----------Position initiale de la raquette----------#
 	raquette = rectangle(positionRaquette[0], positionRaquette[1], 
 		positionRaquette[2], positionRaquette[3],
 		couleur='black', remplissage='', epaisseur=1,)
 
-	
+
 	#----------Position de départ de la balle-------------#
 	positionBalle = [150, 400]
 	balle = cercle(positionBalle[0], positionBalle[1], 4, remplissage="black")
+	
 	
 	#----------Affichage initiale des briques-------------#
 	if not modePerso[0]:
@@ -356,6 +415,7 @@ def lancement(modePerso):
 	else:
 		brique = modePerso[1]
 	afficher_brique(brique)
+
 	
 	#-----------Jeu en attente du joueur------------------#
 	texte(30, 225, '   Appuyez sur une \ntouche pour commencer', couleur='red',
@@ -366,7 +426,6 @@ def lancement(modePerso):
 	#----------affichage initiale du chronometre----------#
 	temps = timer(0, time())
 
-
 	while (vie > 0 and fin == False): #Corps du programmes
 
 		
@@ -374,7 +433,10 @@ def lancement(modePerso):
 			if "auto" in argv: #Si on a choisi le mode auto en parametre
 				raquette = mode_auto(raquette)
 			else:
-				raquette = animation_raquette(raquette)
+				if contrôle == 'clavier':
+					raquette = animation_raquette_clavier(raquette)
+				if contrôle == 'souris':
+					raquette = animation_raquette_souris(raquette)
 			efface(balle)
 			balle = animation_balle(balle)
 			collision(positionBalle)
@@ -412,12 +474,13 @@ def lancement(modePerso):
 	efface(raquette)
 
 	if vie == 0:
-		texte(30, 225, 'Vous avez perdu', couleur='red',
-			ancrage='nw', police="Purisa", taille=24)
+		texte(30, 225, 'Vous avez perdu,\n   appuyer sur R \n pour recommencer \n      ou sur une \n  autre touche pour \n        quitter', couleur='red',
+			ancrage='nw', police="Purisa", taille=20)
+		
 	
 	else: #Le joueur a gagner
-		texte(30, 225, 'Vous avez gagné', couleur='red',
-			ancrage='nw', police="Purisa", taille=24)
+		texte(30, 225, 'Vous avez gagné,\n   appuyer sur R \n pour recommencer \n      ou sur une \n  autre touche pour \n        quitter', couleur='red',
+			ancrage='nw', police="Purisa", taille=20)
 		#On calcule son score final
 		tempsATM = int(time()-temps[1])
 		tempsSeconde = temps[0]*60 + tempsATM
@@ -427,5 +490,19 @@ def lancement(modePerso):
 		if not modePerso[0] and score > highscore[-1][0]: #Verification meilleur score
 			meilleur_score(score, highscore)
 
-	attente_touche()
+	while True:
+		ev = donne_evenement()
+		type_ev = type_evenement(ev)
+		if type_ev == "Touche":
+			t = touche(ev)
+			if t == 'r':
+				variables_globales()
+				ferme_fenetre()
+				if not modePerso[0]:
+					lancement([False, None])
+				else:
+					lancement([True, main.lecture()])
+			else:
+				break
+		mise_a_jour()
 	ferme_fenetre()

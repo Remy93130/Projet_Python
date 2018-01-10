@@ -1,8 +1,12 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Fonctions du menu principale du casse brique."""
+# Imports --------------------------------------------------------------------------------------------------------
 from upemtk import *
 import sys
 import jeu
-import score
 
+# Fonctions ------------------------------------------------------------------------------------------------------
 def interface_start():
 	"""Creation de l interface de depart"""
 	cree_fenetre(450, 450)
